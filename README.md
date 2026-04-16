@@ -1,6 +1,6 @@
 # Cryptography Algorithms Implementation
 
-A comprehensive collection of cryptographic algorithms implemented in Python, featuring both encryption and decryption capabilities with file-based input/output and visualization.
+A comprehensive collection of cryptographic algorithms implemented in Python, featuring encryption, decryption, and hashing workflows with file-based input/output and visualization.
 
 ## 📚 Table of Contents
 
@@ -15,7 +15,7 @@ A comprehensive collection of cryptographic algorithms implemented in Python, fe
 
 ## 🔐 Overview
 
-This repository contains implementations of various classical and modern cryptographic algorithms. Each implementation includes proper visualization and demonstrates encryption/decryption processes through file-based operations, making it easy to understand how these algorithms work in practice.
+This repository contains implementations of various classical and modern cryptographic algorithms. It includes encryption/decryption workflows and hashing demonstrations through file-based operations, making it easy to understand how these algorithms work in practice.
 
 ## 🛠️ Algorithms Implemented
 
@@ -36,10 +36,13 @@ This repository contains implementations of various classical and modern cryptog
 
 7. **Man in the Middle Attack** - Demonstration on Diffie-Hellman Key Exchange
 
+8. **SHA1** - Secure Hash Algorithm 1 (Hashing)
+
 ## ✨ Features
 
 - ✅ **File-based I/O**: Read plaintext from input files and write ciphertext to output files
 - ✅ **Encryption & Decryption**: Complete implementation of both processes
+- ✅ **Hashing Support**: Includes one-way hash generation with SHA1
 - ✅ **Visualization**: Clear demonstration of cryptographic processes
 - ✅ **Educational**: Well-structured code suitable for learning purposes
 - ✅ **Multiple Algorithms**: Classical to modern cryptographic techniques
@@ -86,12 +89,18 @@ Security and Privacy Sessional/
 │   ├── plaintext_receiver.txt
 │   └── ciphertext.txt
 │
-└── Man in the Middle Attack/
-    ├── encription_main.py
-    ├── Alice_Inbox.txt
-    ├── Bob_Inbox.txt
-    ├── Darth_Receiving.txt
-    └── Darth_Sending.txt
+├── Man in the Middle Attack/
+│   ├── encription_main.py
+│   ├── Alice_Inbox.txt
+│   ├── Bob_Inbox.txt
+│   ├── Darth_Receiving.txt
+│   └── Darth_Sending.txt
+│
+└── SHA1/
+    ├── main.py
+    ├── message.txt
+    ├── hash.txt
+    └── test.py
 ```
 
 ## 🔧 Installation
@@ -114,13 +123,15 @@ cd cryptography-algorithms
 
 ## 🚀 Usage
 
-Each algorithm is contained in its own directory with a main Python file (`encription_main.py`) and associated text files for input/output.
+Each algorithm is contained in its own directory with a main Python file and associated text files for input/output.
+
+Most modules use `encription_main.py`, while the SHA1 module uses `main.py`.
 
 ### General Steps:
 
 1. Navigate to the desired algorithm directory
-2. Edit the `plaintext_sender.txt` file with your message
-3. Run the encryption/decryption script:
+2. Edit the input message file (for example, `plaintext_sender.txt` or `message.txt`)
+3. Run the module script (commonly `encription_main.py`, or `main.py` for SHA1):
 
 ```bash
 python encription_main.py
@@ -175,6 +186,10 @@ A key exchange protocol that allows two parties to establish a shared secret key
 ### 7. Man in the Middle Attack
 
 A demonstration of security vulnerabilities in the Diffie-Hellman key exchange, showing how an attacker (Darth) can intercept communications between Alice and Bob.
+
+### 8. SHA1 (Secure Hash Algorithm 1)
+
+A one-way cryptographic hash function that converts an input message into a fixed-length digest. This module demonstrates hash generation and verification-oriented workflow using file input/output.
 
 ## 📝 License
 
