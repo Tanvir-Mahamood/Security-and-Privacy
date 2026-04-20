@@ -1,6 +1,5 @@
 def text_to_binary(plaintext):
-    binary_string = ''.join(format(ord(char), '08b') for char in plaintext)
-    return binary_string
+    return ''.join(format(byte, '08b') for byte in plaintext.encode('utf-8'))
 
 def binary_to_hex(binary_string):
     hex_string = ''
@@ -13,9 +12,7 @@ def binary_to_hex(binary_string):
 def left_rotate(value, shift):
     return ((value << shift) | (value >> (32 - shift))) & 0xFFFFFFFF
 
-def Round(i, hash_values, w_i):
-    A, B, C, D, E = [int(hash_values[j*32:(j+1)*32], 2) for j in range(5)]
-
+def Round(i, A, B, C, D, E, w_i):
     if 0 <= i <= 19:
         f = (B & C) | ((~B) & D)
         k = 0x5A827999
@@ -29,8 +26,7 @@ def Round(i, hash_values, w_i):
         f = B ^ C ^ D
         k = 0xCA62C1D6
 
-    temp = left_rotate(A, 5) + f + E + k + w_i
-    temp = temp & 0xFFFFFFFF
+    temp = (left_rotate(A, 5) + f + E + k + w_i) & 0xFFFFFFFF
 
     E = D
     D = C  
@@ -38,22 +34,30 @@ def Round(i, hash_values, w_i):
     B = A
     A = temp
     
-    return ''.join(format(value, '032b') for value in [A, B, C, D, E])
+    return A, B, C, D, E
 
-def MSA(block, initial_hash_binary):
+def MSA(block, H):
     w = [0] * 80
+    
     for i in range(16):
         w[i] = int(block[i*32:(i+1)*32], 2)
 
     for i in range(16, 80):
-        w[i] = (w[i-3] ^ w[i-8] ^ w[i-14] ^ w[i-16])
+        w[i] = left_rotate(w[i-3] ^ w[i-8] ^ w[i-14] ^ w[i-16], 1) # Added the left_rotate by 1 (The difference between SHA-0 and SHA-1)
 
-    hash_binary_new = initial_hash_binary
-    for i in range(0, 80):
-        hash_binary_new = Round(i, hash_binary_new, w[i])
+    A, B, C, D, E = H
 
-    return str(hash_binary_new)
+    for i in range(80):
+        A, B, C, D, E = Round(i, A, B, C, D, E, w[i])
 
+    # Add the compressed chunk to the current hash value (modulo 2^32)
+    H[0] = (H[0] + A) & 0xFFFFFFFF
+    H[1] = (H[1] + B) & 0xFFFFFFFF
+    H[2] = (H[2] + C) & 0xFFFFFFFF
+    H[3] = (H[3] + D) & 0xFFFFFFFF
+    H[4] = (H[4] + E) & 0xFFFFFFFF
+
+    return H
 
 def SHA1(message):
     message_binary = text_to_binary(message)
@@ -62,8 +66,6 @@ def SHA1(message):
 
     if length > 2**64 - 1:
         raise ValueError("Message is too long to be processed by SHA-1.")
-    elif length == 0:
-        return ""
 
     initial_hash_values = [
         0x67452301,
@@ -72,31 +74,34 @@ def SHA1(message):
         0x10325476,
         0xC3D2E1F0
     ]
-    initial_hash_binary = ''.join(format(hash_value, '032b') for hash_value in initial_hash_values)
 
     length_binary64 = format(length, '064b') 
-    remaining_length = len(message_binary) % block_size + 64
-    padding_length = (block_size - remaining_length) % block_size
-    padding = '1' + '0' * (padding_length - 1)
+    
+    padding_length = (448 - (length + 1) % 512) % 512
+    padding = '1' + '0' * padding_length
     message_binary += padding + length_binary64
 
     blocks = [message_binary[i : i + block_size] for i in range(0, len(message_binary), block_size)]
 
+    H = initial_hash_values[:]
     for block in blocks:
-        hash_value = MSA(block, initial_hash_binary)
-        initial_hash_binary = hash_value
+        H = MSA(block, H)
 
-    return initial_hash_binary
+    # Convert the final integer hash values back to your binary string format
+    return ''.join(format(h, '032b') for h in H)
 
 def main():
+    
     with open("message.txt", "r", encoding="utf-8") as f:
         message = f.read()
     
     hash_value = SHA1(message)
+    final_hex = binary_to_hex(hash_value)
+    
+    print(f"SHA-1 Hash: {final_hex}")
 
     with open("hash.txt", "w", encoding="utf-8") as f:
-        f.write(binary_to_hex(hash_value))
-    
+        f.write(final_hex)
 
 if __name__ == "__main__":
     main()
