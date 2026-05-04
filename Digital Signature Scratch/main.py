@@ -35,6 +35,9 @@ def main():
     signature = sign_with_private_key(sender_message, private_key)
     packet = build_packet(sender_message, signature)
 
+    # Attack Simulation
+    modifiedPacket = build_packet("This is Partha", signature)
+
     # Receiver side
     received_message, received_signature = split_packet(packet)
     is_valid = verify_with_public_key(received_message, received_signature, public_key)
